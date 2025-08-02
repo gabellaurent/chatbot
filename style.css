@@ -73,6 +73,7 @@
   width: 100vw;
   max-width: 600px;
   padding: 0.7rem 0.8rem 1.2rem 0.8rem;
+  margin-bottom: 15vh;
   background: #23272a;
   box-sizing: border-box;
   gap: 0.7rem;
