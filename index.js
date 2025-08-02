@@ -88,4 +88,24 @@ async function updateLastSeen() {
 // Executa ao carregar a página e mostra no console o resultado
 window.addEventListener('DOMContentLoaded', async () => {
   await checkAndUpdateSession();
+
+  // Adiciona envio de mensagem e exibição do balão do usuário
+  const chatForm = document.getElementById('chatForm');
+  const chatInput = document.getElementById('chatInput');
+  const messagesArea = document.getElementById('messagesArea');
+
+  if (chatForm && chatInput && messagesArea) {
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const msg = chatInput.value.trim();
+      if (!msg) return;
+      // Adiciona o balão do usuário
+      const div = document.createElement('div');
+      div.className = 'message user';
+      div.textContent = msg;
+      messagesArea.appendChild(div);
+      messagesArea.scrollTop = messagesArea.scrollHeight;
+      chatInput.value = '';
+    });
+  }
 });
