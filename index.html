@@ -12,5 +12,15 @@
     <p class="chatbot-message">Verificando se há algum usuário interagindo com o chatbot.</p>
     <div class="spinner"></div>
   </div>
+
+  <div class="chat-area" style="display:none;">
+    <div class="messages-area" id="messagesArea"></div>
+    <form class="input-area" id="chatForm" autocomplete="off">
+      <input type="text" id="chatInput" placeholder="Digite sua mensagem..." required />
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
+
+  <script type="module" src="index.js"></script>
 </body>
 </html>

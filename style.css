@@ -1,3 +1,95 @@
+/* Chat area estilo Discord */
+.chat-area {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100vw;
+  min-height: 100vh;
+  background: #23272a;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+.messages-area {
+  flex: 1;
+  width: 100vw;
+  max-width: 600px;
+  padding: 1.2rem 0.8rem 0.5rem 0.8rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  box-sizing: border-box;
+}
+
+.message {
+  max-width: 80%;
+  padding: 1rem 1.3rem;
+  border-radius: 1.2rem;
+  font-size: 1.25rem;
+  word-break: break-word;
+  box-shadow: 0 1px 4px #18191c22;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+.message.user {
+  align-self: flex-end;
+  background: #5865f2;
+  color: #fff;
+}
+.message.bot {
+  align-self: flex-start;
+  background: #40444b;
+  color: #b9bbbe;
+}
+
+.input-area {
+  display: flex;
+  width: 100vw;
+  max-width: 600px;
+  padding: 0.7rem 0.8rem 1.2rem 0.8rem;
+  background: #23272a;
+  box-sizing: border-box;
+  gap: 0.7rem;
+}
+.input-area input[type="text"] {
+  flex: 1;
+  padding: 1rem 1.2rem;
+  border-radius: 1.5rem;
+  border: none;
+  font-size: 1.2rem;
+  background: #40444b;
+  color: #fff;
+  outline: none;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  box-shadow: 0 1px 4px #18191c22;
+}
+.input-area input[type="text"]::placeholder {
+  color: #b9bbbe;
+  opacity: 1;
+}
+.input-area button {
+  padding: 0 1.5rem;
+  border-radius: 1.5rem;
+  border: none;
+  background: #5865f2;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 1px 4px #18191c22;
+}
+.input-area button:active {
+  background: #4752c4;
+}
+.input-area button:disabled {
+  background: #b9bbbe;
+  color: #23272a;
+  cursor: not-allowed;
+}
 html, body {
   width: 100vw;
   height: 100vh;
