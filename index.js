@@ -1,6 +1,7 @@
 import { supabase } from './supabaseClient.js';
 
 const SESSION_UUID = '13b35ace-a1d0-4161-9f67-e43dca7c62a6';
+let heartbeatInterval = null;
 
 export async function checkAndUpdateSession() {
   console.log('Iniciando verificação da sessão...');
@@ -39,6 +40,8 @@ export async function checkAndUpdateSession() {
     const chatArea = document.querySelector('.chat-area');
     if (chatArea) chatArea.style.display = 'none';
     console.log('last_seen está recente. Chat NÃO exibido, tela de verificação mantida.');
+    // Para o heartbeat se estava rodando
+    if (heartbeatInterval) clearInterval(heartbeatInterval);
     return false;
   } else {
     // Se for antiga, atualiza o last_seen normalmente e exibe o chat
@@ -55,7 +58,30 @@ export async function checkAndUpdateSession() {
     if (container) container.style.display = 'none';
     const chatArea = document.querySelector('.chat-area');
     if (chatArea) chatArea.style.display = 'flex';
+    // Inicia o heartbeat para atualizar last_seen a cada 30s
+    startHeartbeat();
     return true;
+  }
+}
+
+function startHeartbeat() {
+  if (heartbeatInterval) clearInterval(heartbeatInterval);
+  // Atualiza imediatamente
+  updateLastSeen();
+  // Atualiza a cada 30s
+  heartbeatInterval = setInterval(updateLastSeen, 30000);
+}
+
+async function updateLastSeen() {
+  const now = new Date();
+  const { error } = await supabase
+    .from('chatbot_sessions')
+    .update({ last_seen: now.toISOString() })
+    .eq('id', SESSION_UUID);
+  if (error) {
+    console.error('Erro ao atualizar last_seen (heartbeat):', error);
+  } else {
+    console.log('last_seen atualizado pelo heartbeat:', now.toISOString());
   }
 }
 
