@@ -87,15 +87,41 @@ async function updateLastSeen() {
 
 // Executa ao carregar a página e mostra no console o resultado
 window.addEventListener('DOMContentLoaded', async () => {
-  await checkAndUpdateSession();
+  const chatLoaded = await checkAndUpdateSession();
 
   // Adiciona envio de mensagem e exibição do balão do usuário
   const chatForm = document.getElementById('chatForm');
   const chatInput = document.getElementById('chatInput');
   const messagesArea = document.getElementById('messagesArea');
 
+  // Se o chat foi liberado, limpa a tabela e adiciona mensagem de boas-vindas
+  if (chatLoaded && messagesArea) {
+    // Limpa a tabela 'conversas'
+    await supabase.from('conversas').delete().not('id', 'is', null);
+    // Adiciona mensagem de boas-vindas
+    const { data, error } = await supabase.from('conversas').insert([
+      {
+        pergunta: null,
+        resposta: 'Olá, bem vindo. Como posso te ajudar hoje?',
+        created_at: new Date().toISOString(),
+        respondido: false,
+        status: null
+      }
+    ]).select();
+    if (error) {
+      console.error('Erro ao inserir mensagem de boas-vindas:', error);
+    } else if (data && data[0] && data[0].resposta) {
+      // Exibe a mensagem do chatbot
+      const div = document.createElement('div');
+      div.className = 'message bot';
+      div.textContent = data[0].resposta;
+      messagesArea.appendChild(div);
+      messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+  }
+
   if (chatForm && chatInput && messagesArea) {
-    chatForm.addEventListener('submit', (e) => {
+    chatForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const msg = chatInput.value.trim();
       if (!msg) return;
@@ -106,6 +132,43 @@ window.addEventListener('DOMContentLoaded', async () => {
       messagesArea.appendChild(div);
       messagesArea.scrollTop = messagesArea.scrollHeight;
       chatInput.value = '';
+      // Insere a mensagem do usuário na tabela 'conversas'
+      const { data, error } = await supabase.from('conversas').insert([
+        {
+          pergunta: msg,
+          resposta: null,
+          created_at: new Date().toISOString(),
+          respondido: false,
+          status: null
+        }
+      ]).select();
+      if (error) {
+        console.error('Erro ao inserir mensagem do usuário:', error);
+      }
+      // Adiciona o balão do chatbot com animação de "escrevendo" e marca com id
+      let insertedId = null;
+      if (data && data[0] && data[0].id) {
+        insertedId = data[0].id;
+      }
+      const botDiv = document.createElement('div');
+      botDiv.className = 'message bot';
+      botDiv.setAttribute('data-msgid', insertedId || 'pending');
+      botDiv.innerHTML = 'O chatbot está escrevendo uma mensagem <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>';
+      messagesArea.appendChild(botDiv);
+      messagesArea.scrollTop = messagesArea.scrollHeight;
     });
+
+    // Realtime: escuta atualizações na tabela conversas
+    supabase
+      .channel('conversas-updates')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversas' }, payload => {
+        const msg = payload.new;
+        // Substitui o balão "escrevendo" pela resposta do bot
+        const botDiv = messagesArea.querySelector('[data-msgid="' + msg.id + '"]');
+        if (botDiv && msg.resposta) {
+          botDiv.textContent = msg.resposta;
+        }
+      })
+      .subscribe();
   }
 });
