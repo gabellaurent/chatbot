@@ -32,7 +32,7 @@ html, body {
 }
 
 .chatbot-title {
-  font-size: 2.6rem;
+  font-size: 5.2rem;
   font-weight: 700;
   color: #fff;
   margin-bottom: 14px;
@@ -42,22 +42,22 @@ html, body {
 }
 
 .chatbot-message {
-  font-size: 1.25rem;
+  font-size: 2.5rem;
   color: #b9bbbe;
   margin-bottom: 28px;
   text-align: center;
   font-family: 'Segoe UI', 'Arial', sans-serif;
   background: #23272a;
-  padding: 0.9rem 1.2rem;
+  padding: 1.8rem 2.4rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px #18191c22;
 }
 
 .spinner {
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 0.32rem solid #40444b;
-  border-top: 0.32rem solid #7289da;
+  width: 5rem;
+  height: 5rem;
+  border: 0.64rem solid #40444b;
+  border-top: 0.64rem solid #7289da;
   border-radius: 50%;
   animation: spin 0.85s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
   margin-top: 8px;
