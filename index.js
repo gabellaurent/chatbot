@@ -121,6 +121,35 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   if (chatForm && chatInput && messagesArea) {
+    // Função para buscar e exibir resposta do bot
+    async function buscarEResponder() {
+      // Busca todas as conversas com resposta não nula, ordenadas pela criação
+      const { data, error } = await supabase
+        .from('conversas')
+        .select('*')
+        .order('created_at', { ascending: true });
+      if (error) {
+        console.error('Erro ao buscar conversas:', error);
+        return;
+      }
+      if (data && data.length > 0) {
+        data.forEach(conversa => {
+          // Se resposta for diferente de null e ainda não exibida
+          if (conversa.resposta && !messagesArea.querySelector('[data-msgid="' + conversa.id + '"]')) {
+            const botDiv = document.createElement('div');
+            botDiv.className = 'message bot';
+            botDiv.setAttribute('data-msgid', conversa.id);
+            botDiv.textContent = conversa.resposta;
+            messagesArea.appendChild(botDiv);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+          }
+        });
+      }
+    }
+
+    // Polling a cada 10s
+    setInterval(buscarEResponder, 10000);
+
     chatForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const msg = chatInput.value.trim();
@@ -145,30 +174,8 @@ window.addEventListener('DOMContentLoaded', async () => {
       if (error) {
         console.error('Erro ao inserir mensagem do usuário:', error);
       }
-      // Adiciona o balão do chatbot com animação de "escrevendo" e marca com id
-      let insertedId = null;
-      if (data && data[0] && data[0].id) {
-        insertedId = data[0].id;
-      }
-      const botDiv = document.createElement('div');
-      botDiv.className = 'message bot';
-      botDiv.setAttribute('data-msgid', insertedId || 'pending');
-      botDiv.innerHTML = 'O chatbot está escrevendo uma mensagem <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>';
-      messagesArea.appendChild(botDiv);
-      messagesArea.scrollTop = messagesArea.scrollHeight;
+      // Após enviar, tenta buscar resposta imediatamente
+      setTimeout(buscarEResponder, 1000);
     });
-
-    // Realtime: escuta atualizações na tabela conversas
-    supabase
-      .channel('conversas-updates')
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversas' }, payload => {
-        const msg = payload.new;
-        // Substitui o balão "escrevendo" pela resposta do bot
-        const botDiv = messagesArea.querySelector('[data-msgid="' + msg.id + '"]');
-        if (botDiv && msg.resposta) {
-          botDiv.textContent = msg.resposta;
-        }
-      })
-      .subscribe();
   }
 });
